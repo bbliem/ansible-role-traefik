@@ -1,0 +1,55 @@
+- name: Create Traefik config directory
+  file:
+    path: "{{ traefik_config_dir }}"
+    state: directory
+    mode: 0700
+
+- name: Copy acme.json
+  template:
+    src: templates/acme.json
+    dest: "{{ traefik_config_dir }}/acme.json"
+    mode: 0600
+    force: no
+
+- name: Create docker networks
+  docker_network:
+    name: "{{ item.name }}"
+    state: present
+  loop: "{{ traefik_networks }}"
+
+- name: Initialize traefik arguments
+  set_fact:
+    _traefik_arguments: "{{ traefik_arguments }}"
+
+- name: Extend arguments if debug mode is on
+  set_fact:
+    _traefik_arguments: "{{ _traefik_arguments + traefik_debug_extra_arguments }}"
+  when: traefik_debug
+
+- name: Initialize traefik labels
+  set_fact:
+    _traefik_labels: "{{ traefik_labels }}"
+
+- name: Extend labels if debug mode is on
+  set_fact:
+    _traefik_labels: "{{ _traefik_labels | combine(traefik_debug_extra_labels) }}"
+  when: traefik_debug
+
+- name: Traefik container
+  docker_container:
+    state: started
+    name: traefik
+    image: "{{ traefik_docker_image }}"
+    restart_policy: unless-stopped
+    command: "{{ _traefik_arguments }}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ traefik_config_dir }}/acme.json:/acme.json"
+    labels: "{{ _traefik_labels }}"
+    log_driver: json-file
+    log_options:
+      max-size: "100m"
+    networks: "{{ traefik_networks }}"
