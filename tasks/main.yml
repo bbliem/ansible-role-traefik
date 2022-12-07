@@ -49,7 +49,6 @@
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ traefik_config_dir }}/acme.json:/acme.json"
     labels: "{{ _traefik_labels }}"
-    log_driver: json-file
-    log_options:
-      max-size: "100m"
+    log_driver: "{{ traefik_docker_log_driver }}"
+    log_options: "{{ traefik_docker_log_options }}"
     networks: "{{ traefik_networks }}"
