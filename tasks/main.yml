@@ -1,42 +1,42 @@
 - name: Create Traefik config directory
-  file:
+  ansible.builtin.file:
     path: "{{ traefik_config_dir }}"
     state: directory
     mode: 0700
 
 - name: Copy acme.json
-  template:
+  ansible.builtin.template:
     src: templates/acme.json
     dest: "{{ traefik_config_dir }}/acme.json"
     mode: 0600
-    force: no
+    force: false
 
 - name: Create docker networks
-  docker_network:
+  community.docker.docker_network:
     name: "{{ item.name }}"
     state: present
   loop: "{{ traefik_networks }}"
 
 - name: Initialize traefik arguments
-  set_fact:
+  ansible.builtin.set_fact:
     _traefik_arguments: "{{ traefik_arguments }}"
 
 - name: Extend arguments if debug mode is on
-  set_fact:
+  ansible.builtin.set_fact:
     _traefik_arguments: "{{ _traefik_arguments + traefik_debug_extra_arguments }}"
   when: traefik_debug
 
 - name: Initialize traefik labels
-  set_fact:
+  ansible.builtin.set_fact:
     _traefik_labels: "{{ traefik_labels }}"
 
 - name: Extend labels if debug mode is on
-  set_fact:
+  ansible.builtin.set_fact:
     _traefik_labels: "{{ _traefik_labels | combine(traefik_debug_extra_labels) }}"
   when: traefik_debug
 
 - name: Traefik container
-  docker_container:
+  community.docker.docker_container:
     state: started
     name: traefik
     image: "{{ traefik_docker_image }}"
