@@ -1,6 +1,6 @@
 traefik_config_dir: /usr/local/etc/traefik
 traefik_debug: false
-traefik_docker_image: traefik:latest
+traefik_docker_image: traefik:v2.10
 traefik_docker_log_driver: json-file
 traefik_docker_log_options:
   max-size: "100m"
