@@ -1,4 +1,4 @@
-traefik_arguments:
+traefik_base_arguments:
   - --entrypoints.web.address=:80
   - --entrypoints.websecure.address=:443
   - --providers.docker=true

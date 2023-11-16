@@ -19,7 +19,7 @@
 
 - name: Initialize traefik arguments
   ansible.builtin.set_fact:
-    _traefik_arguments: "{{ traefik_arguments }}"
+    _traefik_arguments: "{{ traefik_base_arguments + traefik_extra_arguments }}"
 
 - name: Extend arguments if debug mode is on
   ansible.builtin.set_fact:
