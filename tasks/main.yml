@@ -28,7 +28,7 @@
 
 - name: Initialize traefik labels
   ansible.builtin.set_fact:
-    _traefik_labels: "{{ traefik_labels }}"
+    _traefik_labels: "{{ traefik_base_labels | combine(traefik_extra_labels) }}"
 
 - name: Extend labels if debug mode is on
   ansible.builtin.set_fact:

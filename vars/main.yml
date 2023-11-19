@@ -15,7 +15,7 @@ traefik_debug_extra_arguments:
   - --api=true
   - --api.dashboard=true
 
-traefik_labels:
+traefik_base_labels:
   # Redirect to HTTPS for all hosts
   traefik.enable: "true"
   traefik.http.routers.http-catchall.rule: "hostregexp(`{host:.+}`)"
