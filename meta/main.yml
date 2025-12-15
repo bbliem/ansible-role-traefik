@@ -2,7 +2,7 @@ galaxy_info:
   role_name: traefik
   namespace: bbliem
   author: Bernhard Bliem
-  description: Install Traefik 2
+  description: Install Traefik
   license: MIT
   min_ansible_version: "2.9"
   platforms:

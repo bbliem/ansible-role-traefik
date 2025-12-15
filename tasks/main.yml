@@ -11,43 +11,42 @@
     mode: 0600
     force: false
 
+- name: Copy traefik.yml
+  ansible.builtin.template:
+    src: templates/traefik.yml
+    dest: "{{ traefik_config_dir }}/traefik.yml"
+    mode: 0644
+
 - name: Create docker networks
   community.docker.docker_network:
     name: "{{ item.name }}"
     state: present
   loop: "{{ traefik_networks }}"
 
-- name: Initialize traefik arguments
-  ansible.builtin.set_fact:
-    _traefik_arguments: "{{ traefik_base_arguments + traefik_extra_arguments }}"
-
-- name: Extend arguments if debug mode is on
-  ansible.builtin.set_fact:
-    _traefik_arguments: "{{ _traefik_arguments + traefik_debug_extra_arguments }}"
-  when: traefik_debug
-
 - name: Initialize traefik labels
   ansible.builtin.set_fact:
     _traefik_labels: "{{ traefik_base_labels | combine(traefik_extra_labels) }}"
 
-- name: Extend labels if debug mode is on
+- name: Extend labels if dashboard is enabled
   ansible.builtin.set_fact:
-    _traefik_labels: "{{ _traefik_labels | combine(traefik_debug_extra_labels) }}"
-  when: traefik_debug
+    _traefik_labels: "{{ _traefik_labels | combine(traefik_dashboard_extra_labels) }}"
+  when: traefik_dashboard
 
 - name: Traefik container
   community.docker.docker_container:
     state: started
     name: traefik
     image: "{{ traefik_docker_image }}"
-    restart_policy: unless-stopped
-    command: "{{ _traefik_arguments }}"
+    restart: true
+    command:
+      - --configFile=/traefik.yml
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ traefik_config_dir }}/acme.json:/acme.json"
+      - "{{ traefik_config_dir }}/traefik.yml:/traefik.yml"
     labels: "{{ _traefik_labels }}"
     log_driver: "{{ traefik_docker_log_driver }}"
     log_options: "{{ traefik_docker_log_options }}"

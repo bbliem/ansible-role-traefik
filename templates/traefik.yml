@@ -1,0 +1,38 @@
+providers:
+  docker:
+    exposedByDefault: false
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+    observability:
+      accessLogs: false
+      metrics: false
+      tracing: false
+
+  websecure:
+    address: :443
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: {{ traefik_acme_email }}
+      storage: /acme.json
+      httpChallenge:
+        # used during the challenge
+        entryPoint: web
+
+{% if traefik_debug %}
+log:
+  level: DEBUG
+{% endif %}
+
+{% if traefik_dashboard %}
+api: {}
+{% endif %}
