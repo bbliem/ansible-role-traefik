@@ -4,6 +4,7 @@ traefik_base_arguments:
 traefik_base_labels: {}
 
 traefik_dashboard_extra_labels:
+  traefik.enable: "true"
   # Make the dashboard available at https://{{ traefik_api_host }}/dashboard/
   # Note that the trailing slash is unfortunately important.
   traefik.http.routers.dashboard.rule: "{{ traefik_dashboard_router_rule }}"
