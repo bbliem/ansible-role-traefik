@@ -37,6 +37,7 @@
     state: started
     name: traefik
     image: "{{ traefik_docker_image }}"
+    pull: always
     restart: true
     command:
       - --configFile=/traefik.yml
